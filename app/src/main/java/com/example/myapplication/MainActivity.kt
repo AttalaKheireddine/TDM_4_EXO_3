@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     var listToShow= taskList;
     var shownList = ArrayList<Task>();
     val taskAdapter = TaskAdapter(shownList,this);
-    var spinnerItem = "Daily"
+    var spinnerItem = "All"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             val adapter = ArrayAdapter(
                 this,
                 android.R.layout.simple_spinner_item,
-                listOf("Daily", "Weekly", "All")
+                listOf("All", "Daily", "Weekly")
             )
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
@@ -52,26 +52,26 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            if (dailyButton!=null)
-            {
-                dailyButton.setOnClickListener{
-                changeShownListToDaily()
-                }
-            }
-            if (weeklyButton!=null){
-                weeklyButton.setOnClickListener{
-                changeShownListToWeekly()
-                }
-            }
 
-            if (allButton!=null)
-            {
-                allButton.setOnClickListener{
-                changeShownListToAll()
-                }
+        }
+        if (dailyButton!=null)
+        {
+            dailyButton.setOnClickListener{
+                updateItem("Daily")
+            }
+        }
+        if (weeklyButton!=null){
+            weeklyButton.setOnClickListener{
+                updateItem("Weekly")
             }
         }
 
+        if (allButton!=null)
+        {
+            allButton.setOnClickListener{
+                updateItem("All")
+            }
+        }
 
 
         addTaskButton.setOnClickListener{
