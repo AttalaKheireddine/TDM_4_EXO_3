@@ -16,12 +16,12 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "Activity 1"
-    val calendar = Calendar.getInstance();
+    var calendar = Calendar.getInstance();
     var taskList = ArrayList<Task>();
     var listToShow= taskList;
     var shownList = ArrayList<Task>();
     val taskAdapter = TaskAdapter(shownList,this);
-
+    var spinnerItem = "Daily"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,40 +40,39 @@ class MainActivity : AppCompatActivity() {
             spinner.adapter = adapter
             spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-
+                    changeShownListToDaily()
                 }
 
                 override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                    // either one will work as well
-                    // val item = parent.getItemAtPosition(position) as String
                     val item = adapter.getItem(position)
-                    if (item=="Daily")
+                    if (item!=null)
                     {
-                        changeShownListToDaily()
-                    }
-                    else if (item == "Weekly")
-                    {
-                        changeShownListToWeekly()
-                    }
-                    else
-                    {
-                        changeShownListToAll()
+                       updateItem(item)
+                        spinnerItem = item
                     }
                 }
             }
-
-            dailyButton.setOnClickListener{
+            if (dailyButton!=null)
+            {
+                dailyButton.setOnClickListener{
                 changeShownListToDaily()
+                }
             }
-
-            weeklyButton.setOnClickListener{
+            if (weeklyButton!=null){
+                weeklyButton.setOnClickListener{
                 changeShownListToWeekly()
+                }
             }
 
-            allButton.setOnClickListener{
+            if (allButton!=null)
+            {
+                allButton.setOnClickListener{
                 changeShownListToAll()
+                }
             }
         }
+
+
 
         addTaskButton.setOnClickListener{
             DatePickerDialog(
@@ -96,12 +95,30 @@ class MainActivity : AppCompatActivity() {
             calendar.set(Calendar.MONTH, monthOfYear)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             addTask()
+            calendar = Calendar.getInstance()
+        }
+    }
+
+    fun updateItem(item:String)
+    {
+        if (item=="Daily")
+        {
+            changeShownListToDaily()
+        }
+        else if (item == "Weekly")
+        {
+            changeShownListToWeekly()
+        }
+        else
+        {
+            changeShownListToAll()
         }
     }
 
     fun addTask()
     {
         taskList.add(Task(taskTextInput.text.toString(),calendar))
+        updateItem(spinnerItem)
         updateShownList()
     }
 
@@ -109,10 +126,10 @@ class MainActivity : AppCompatActivity() {
     {
         val calendar = Calendar.getInstance() //a convenient way to get the current date
         var dailyList = ArrayList<Task>();
-        val myFormat = "dd" // mention the format you need
+        val myFormat = "dd-MM-yyyy" // mention the format you need
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         taskList.forEach{
-            if (sdf.format(calendar.time)==sdf.format(it.date))
+            if (sdf.format(calendar.time).equals(sdf.format(it.date.time)))
             {
                 dailyList.add(it)
             }
@@ -123,14 +140,16 @@ class MainActivity : AppCompatActivity() {
 
     fun changeShownListToWeekly()
     {
-        val calendar = Calendar.getInstance() //a convenient way to get the current date
+        val calendarNow = Calendar.getInstance() //a convenient way to get the current date
+        val calendarAfterAWeek = Calendar.getInstance()
+        calendarAfterAWeek.add(Calendar.DATE,7)
         var weeklyList = ArrayList<Task>();
-        val myFormat = "dd" // mention the format you need
+        val myFormat = "dd-MM-yyy" // mention the format you need
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         taskList.forEach{
-            if (sdf.format(calendar.time)+7>sdf.format(it.date))
+            if (sdf.format(calendarAfterAWeek.time)>sdf.format(it.date.time))
             {
-                if (sdf.format(calendar.time)<=sdf.format(it.date))
+                if (sdf.format(calendarNow.time)<=sdf.format(it.date.time))
                 weeklyList.add(it)
             }
         }
